@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, ActivityIndicator, Alert, RefreshControl } from "react-native";
+import { View, Text, FlatList, ActivityIndicator, Alert, RefreshControl, TextInput } from "react-native";
 import { Button, ListItem } from "@rneui/themed";
 import axios from "axios";
 
@@ -9,6 +9,8 @@ const UserListScreen = ({ navigation }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     fetchUsers();
@@ -40,7 +42,7 @@ const UserListScreen = ({ navigation }) => {
         onPress: async () => {
           try {
             await axios.delete(`${API_URL}/${userId}`);
-            setUsers(users.filter(user => user._id !== userId)); 
+            setUsers(users.filter(user => user._id !== userId));
           } catch (error) {
             Alert.alert("Lỗi", "Không thể xóa người dùng");
           }
@@ -48,6 +50,30 @@ const UserListScreen = ({ navigation }) => {
       },
     ]);
   };
+
+  const addUser = async () => {
+    if (!name || !email) {
+      Alert.alert("Lỗi", "Vui lòng nhập đầy đủ thông tin");
+      return;
+    }
+    try {
+      console.log("Dữ liệu gửi lên API:", { name, email });
+  
+      const response = await axios.post(API_URL, { name, email }, {
+        headers: { "Content-Type": "application/json" }
+      });
+  
+      console.log("Phản hồi API:", response.data);
+      setUsers([...users, response.data]);
+      setName("");
+      setEmail("");
+    } catch (error) {
+      console.error("Lỗi khi thêm người dùng:", error.response?.data || error.message);
+      Alert.alert("Lỗi", error.response?.data?.message || "Không thể thêm người dùng");
+    }
+  };
+  
+  
 
   const renderItem = ({ item }) => (
     <ListItem bottomDivider>
@@ -65,6 +91,19 @@ const UserListScreen = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1, padding: 10 }}>
+      <TextInput 
+        placeholder="Nhập tên" 
+        value={name} 
+        onChangeText={setName} 
+        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+      />
+      <TextInput 
+        placeholder="Nhập email" 
+        value={email} 
+        onChangeText={setEmail} 
+        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
+      />
+      <Button title="Thêm người dùng" onPress={addUser} />
       <FlatList
         data={users}
         keyExtractor={(item) => item._id.toString()} 
