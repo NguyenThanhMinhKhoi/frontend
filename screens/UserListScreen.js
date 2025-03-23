@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, ActivityIndicator, Alert, RefreshControl } from "react-native";
-import { Button, ListItem } from "@rneui/themed"; // Import ListItem
+import { Button, ListItem } from "@rneui/themed";
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api/users"; // Đổi API URL cho đúng
+const API_URL = "http://localhost:5000/api/users";
 
 const UserListScreen = ({ navigation }) => {
   const [users, setUsers] = useState([]);
@@ -40,7 +40,7 @@ const UserListScreen = ({ navigation }) => {
         onPress: async () => {
           try {
             await axios.delete(`${API_URL}/${userId}`);
-            setUsers(users.filter(user => user._id !== userId)); // Sửa .id thành ._id nếu MongoDB
+            setUsers(users.filter(user => user._id !== userId)); 
           } catch (error) {
             Alert.alert("Lỗi", "Không thể xóa người dùng");
           }
@@ -67,7 +67,7 @@ const UserListScreen = ({ navigation }) => {
     <View style={{ flex: 1, padding: 10 }}>
       <FlatList
         data={users}
-        keyExtractor={(item) => item._id.toString()} // Đảm bảo key là _id
+        keyExtractor={(item) => item._id.toString()} 
         renderItem={renderItem}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       />
